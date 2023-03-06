@@ -68,15 +68,15 @@ DB_INFO=$( ${INSTALL_DIRECTORY}/env/bin/python ${INSTALL_DIRECTORY}/mycodo/scrip
 INFLUXDB_INSTALLED=$( jq -r  '.influxdb_installed' <<< "${DB_INFO}" )
 INFLUXDB_VERSION=$( jq -r  '.influxdb_version' <<< "${DB_INFO}" )
 
-if [ "$INFLUXDB_INSTALLED" == "true" ] && [[ ${INFLUXDB_VERSION} == 1* ]]; then
-    TIMER_START_update_influxdb=$SECONDS
-    ${INSTALL_CMD} update-influxdb-1
-    TIMER_TOTAL_update_influxdb=$((SECONDS - TIMER_START_update_influxdb))
-elif [ "$INFLUXDB_INSTALLED" == "true" ] && [[ ${INFLUXDB_VERSION} == 2* ]]; then
-    TIMER_START_update_influxdb=$SECONDS
-    ${INSTALL_CMD} update-influxdb-2
-    TIMER_TOTAL_update_influxdb=$((SECONDS - TIMER_START_update_influxdb))
-fi
+# if [ "$INFLUXDB_INSTALLED" == "true" ] && [[ ${INFLUXDB_VERSION} == 1* ]]; then
+#     TIMER_START_update_influxdb=$SECONDS
+#     ${INSTALL_CMD} update-influxdb-1
+#     TIMER_TOTAL_update_influxdb=$((SECONDS - TIMER_START_update_influxdb))
+# elif [ "$INFLUXDB_INSTALLED" == "true" ] && [[ ${INFLUXDB_VERSION} == 2* ]]; then
+#     TIMER_START_update_influxdb=$SECONDS
+#     ${INSTALL_CMD} update-influxdb-2
+#     TIMER_TOTAL_update_influxdb=$((SECONDS - TIMER_START_update_influxdb))
+# fi
 
 TIMER_START_update_dependencies=$SECONDS
 ${INSTALL_CMD} update-dependencies

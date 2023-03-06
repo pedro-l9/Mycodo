@@ -57,9 +57,8 @@ def write_influxdb_value(unique_id, unit, value, measure=None, channel=None, tim
         bucket = f'{settings.measurement_db_dbname}/{settings.measurement_db_retention_policy}'
     elif settings.measurement_db_version == '2':
         client = InfluxDBClient(
-            url=influxdb_url,
-            username=settings.measurement_db_user,
-            password=settings.measurement_db_password,
+            url=os.environ.get('INFLUX_URL'),
+            token=os.environ.get('INFLUX_TOKEN'),
             org='mycodo',
             timeout=5000)
         bucket = settings.measurement_db_dbname
@@ -116,9 +115,8 @@ def add_measurements_influxdb_flux(unique_id, measurements, use_same_timestamp=T
         bucket = f'{settings.measurement_db_dbname}/{settings.measurement_db_retention_policy}'
     elif settings.measurement_db_version == '2':
         client = InfluxDBClient(
-            url=influxdb_url,
-            username=settings.measurement_db_user,
-            password=settings.measurement_db_password,
+            url=os.environ.get('INFLUX_URL'),
+            token=os.environ.get('INFLUX_TOKEN'),
             org='mycodo',
             timeout=5000)
         bucket = settings.measurement_db_dbname
@@ -196,9 +194,8 @@ def query_flux(unit, unique_id,
         bucket = f'{settings.measurement_db_dbname}/{settings.measurement_db_retention_policy}'
     elif settings.measurement_db_version == '2':
         client = InfluxDBClient(
-            url=influxdb_url,
-            username=settings.measurement_db_user,
-            password=settings.measurement_db_password,
+            url=os.environ.get('INFLUX_URL'),
+            token=os.environ.get('INFLUX_TOKEN'),
             org='mycodo',
             timeout=60000)
         bucket = settings.measurement_db_dbname

@@ -91,15 +91,15 @@ ${INSTALL_CMD} update-pip3 2>&1 | tee -a "${LOG_LOCATION}"
 ${INSTALL_CMD} update-pip3-packages 2>&1 | tee -a "${LOG_LOCATION}"
 ${INSTALL_CMD} pip-clear-cache 2>&1 | tee -a "${LOG_LOCATION}"
 ${INSTALL_CMD} install-wiringpi 2>&1 | tee -a "${LOG_LOCATION}"
-if [[ ${1} == '1' ]]; then
-    ${INSTALL_CMD} update-influxdb-1 2>&1 | tee -a "${LOG_LOCATION}"
-    ${INSTALL_CMD} update-influxdb-1-db-user 2>&1 | tee -a "${LOG_LOCATION}"
-elif [[ ${1} == '2' ]]; then
-    ${INSTALL_CMD} update-influxdb-2 2>&1 | tee -a "${LOG_LOCATION}"
-    ${INSTALL_CMD} update-influxdb-2-db-user 2>&1 | tee -a "${LOG_LOCATION}"
-elif [[ ${1} == '0' ]]; then
-    printf "Instructed to not install Influxdb/n"
-fi
+# if [[ ${1} == '1' ]]; then
+#     ${INSTALL_CMD} update-influxdb-1 2>&1 | tee -a "${LOG_LOCATION}"
+#     ${INSTALL_CMD} update-influxdb-1-db-user 2>&1 | tee -a "${LOG_LOCATION}"
+# elif [[ ${1} == '2' ]]; then
+#     ${INSTALL_CMD} update-influxdb-2 2>&1 | tee -a "${LOG_LOCATION}"
+#     ${INSTALL_CMD} update-influxdb-2-db-user 2>&1 | tee -a "${LOG_LOCATION}"
+# elif [[ ${1} == '0' ]]; then
+printf "Instructed to not install Influxdb/n"
+# fi
 ${INSTALL_CMD} initialize 2>&1 | tee -a "${LOG_LOCATION}"
 ${INSTALL_CMD} update-logrotate 2>&1 | tee -a "${LOG_LOCATION}"
 ${INSTALL_CMD} ssl-certs-generate 2>&1 | tee -a "${LOG_LOCATION}"

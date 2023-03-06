@@ -21,13 +21,14 @@ def get_influxdb_host(settings):
         logger.debug(f"Could not determine influxdb host from table: {err}")
 
     list_hosts = [
-        'localhost',
-        '127.0.0.1',
-        'mycodo_influxdb'
+        'localhost:8086',
+        '127.0.0.1:8086',
+        'mycodo_influxdb:8086',
+        os.environ.get('INFLUX_URL')
     ]
     for host in list_hosts:
         try:
-            if requests.get(f"http://{host}:8086/ping").status_code == 204:
+            if requests.get(f"http://{host}/ping").status_code == 204:
                 return host
         except Exception as err:
             logger.debug(f"Could not determine localhost as influxdb host: {err}")

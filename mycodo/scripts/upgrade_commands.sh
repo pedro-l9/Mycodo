@@ -77,10 +77,6 @@ Options:
   enable-pigpiod-disabled       Create empty service to indicate pigpiod is disabled
   uninstall                     Disable Mycodo services (frontend/backend)
   update-pigpiod                Update to latest version of pigpiod service file
-  update-influxdb-1             Update influxdb 1.x to the latest version
-  update-influxdb-2             Update influxdb 2.x to the latest version
-  update-influxdb-1-db-user     Create the influxdb 1.x database and user
-  update-influxdb-2-db-user     Create the influxdb 2.x database and user
   update-logrotate              Install logrotate script
   update-mycodo-service-disable Disable the Mycodo daemon startup script
   update-mycodo-service-enable  Enable the Mycodo daemon startup script
@@ -398,156 +394,156 @@ case "${1:-''}" in
             /bin/bash "${MYCODO_PATH}"/mycodo/scripts/upgrade_commands.sh enable-pigpiod-low
         fi
     ;;
-    'update-influxdb-1')
-        printf "\n#### Ensuring compatible version of influxdb 1.x is installed ####\n"
-        INSTALL_ADDRESS="https://dl.influxdata.com/influxdb/releases/"
-        INSTALL_FILE="influxdb_${INFLUXDB1_VERSION}_${MACHINE_TYPE}.deb"
-        CORRECT_VERSION="${INFLUXDB1_VERSION}-1"
-        CURRENT_VERSION=$(apt-cache policy influxdb | grep 'Installed' | gawk '{print $2}')
+    # 'update-influxdb-1')
+    #     printf "\n#### Ensuring compatible version of influxdb 1.x is installed ####\n"
+    #     INSTALL_ADDRESS="https://dl.influxdata.com/influxdb/releases/"
+    #     INSTALL_FILE="influxdb_${INFLUXDB1_VERSION}_${MACHINE_TYPE}.deb"
+    #     CORRECT_VERSION="${INFLUXDB1_VERSION}-1"
+    #     CURRENT_VERSION=$(apt-cache policy influxdb | grep 'Installed' | gawk '{print $2}')
 
-        if [[ "${CURRENT_VERSION}" != "${CORRECT_VERSION}" ]]; then
-            printf "#### Incorrect InfluxDB version (v${CURRENT_VERSION}) installed. Should be v${CORRECT_VERSION}\n"
+    #     if [[ "${CURRENT_VERSION}" != "${CORRECT_VERSION}" ]]; then
+    #         printf "#### Incorrect InfluxDB version (v${CURRENT_VERSION}) installed. Should be v${CORRECT_VERSION}\n"
 
-            printf "#### Stopping influxdb 2.x (if installed)...\n"
-            service influxd stop
+    #         printf "#### Stopping influxdb 2.x (if installed)...\n"
+    #         service influxd stop
 
-            printf "#### Uninstalling influxdb 2.x (if installed)...\n"
-            DEBIAN_FRONTEND=noninteractive apt remove -y influxdb2 influxdb2-cli
+    #         printf "#### Uninstalling influxdb 2.x (if installed)...\n"
+    #         DEBIAN_FRONTEND=noninteractive apt remove -y influxdb2 influxdb2-cli
 
-            printf "#### Installing InfluxDB v${CORRECT_VERSION}...\n"
+    #         printf "#### Installing InfluxDB v${CORRECT_VERSION}...\n"
 
-            wget --quiet "${INSTALL_ADDRESS}${INSTALL_FILE}"
-            dpkg -i "${INSTALL_FILE}"
-            rm -rf "${INSTALL_FILE}"
+    #         wget --quiet "${INSTALL_ADDRESS}${INSTALL_FILE}"
+    #         dpkg -i "${INSTALL_FILE}"
+    #         rm -rf "${INSTALL_FILE}"
 
-            service influxdb restart
-        else
-            printf "Correct version of InfluxDB currently installed\n"
-        fi
+    #         service influxdb restart
+    #     else
+    #         printf "Correct version of InfluxDB currently installed\n"
+    #     fi
 
-        if [[ $(grep "# flux-enabled = true" /etc/influxdb/influxdb.conf) || $(grep "flux-enabled = false" /etc/influxdb/influxdb.conf) ]]; then   
-            printf "#### Flux found to not be enabled. Enabling and restarting InfluxDB.\n"
-            sed -i 's/.*flux-enabled.*/flux-enabled = true/' /etc/influxdb/influxdb.conf
-            service influxdb restart
-        else
-            printf "Flux is already enabled.\n"
-        fi
-    ;;
-    'update-influxdb-2')
-        printf "\n#### Ensuring compatible version of influxdb 2.x is installed ####\n"
-        if [[ ${UNAME_TYPE} == 'x86_64' || ${MACHINE_TYPE} == 'arm64' ]]; then
-            INSTALL_ADDRESS="https://dl.influxdata.com/influxdb/releases/"
-            INSTALL_FILE="influxdb2-${INFLUXDB2_VERSION}-${MACHINE_TYPE}.deb"
-            CLI_FILE="influxdb2-client-${INFLUXDB2_VERSION}-${MACHINE_TYPE}.deb"
-            CORRECT_VERSION="${INFLUXDB2_VERSION}-1"
-            CURRENT_VERSION=$(apt-cache policy influxdb2 | grep 'Installed' | gawk '{print $2}')
+    #     if [[ $(grep "# flux-enabled = true" /etc/influxdb/influxdb.conf) || $(grep "flux-enabled = false" /etc/influxdb/influxdb.conf) ]]; then   
+    #         printf "#### Flux found to not be enabled. Enabling and restarting InfluxDB.\n"
+    #         sed -i 's/.*flux-enabled.*/flux-enabled = true/' /etc/influxdb/influxdb.conf
+    #         service influxdb restart
+    #     else
+    #         printf "Flux is already enabled.\n"
+    #     fi
+    # ;;
+    # 'update-influxdb-2')
+    #     printf "\n#### Ensuring compatible version of influxdb 2.x is installed ####\n"
+    #     if [[ ${UNAME_TYPE} == 'x86_64' || ${MACHINE_TYPE} == 'arm64' ]]; then
+    #         INSTALL_ADDRESS="https://dl.influxdata.com/influxdb/releases/"
+    #         INSTALL_FILE="influxdb2-${INFLUXDB2_VERSION}-${MACHINE_TYPE}.deb"
+    #         CLI_FILE="influxdb2-client-${INFLUXDB2_VERSION}-${MACHINE_TYPE}.deb"
+    #         CORRECT_VERSION="${INFLUXDB2_VERSION}-1"
+    #         CURRENT_VERSION=$(apt-cache policy influxdb2 | grep 'Installed' | gawk '{print $2}')
 
-            if [[ "${CURRENT_VERSION}" != "${CORRECT_VERSION}" ]]; then
-                printf "#### Incorrect InfluxDB version (v${CURRENT_VERSION}) installed. Should be v${CORRECT_VERSION}\n"
+    #         if [[ "${CURRENT_VERSION}" != "${CORRECT_VERSION}" ]]; then
+    #             printf "#### Incorrect InfluxDB version (v${CURRENT_VERSION}) installed. Should be v${CORRECT_VERSION}\n"
 
-                printf "#### Stopping influxdb 1.x (if installed)...\n"
-                service influxdb stop
+    #             printf "#### Stopping influxdb 1.x (if installed)...\n"
+    #             service influxdb stop
 
-                printf "#### Uninstalling influxdb 1.x (if installed)...\n"
-                DEBIAN_FRONTEND=noninteractive apt remove -y influxdb
+    #             printf "#### Uninstalling influxdb 1.x (if installed)...\n"
+    #             DEBIAN_FRONTEND=noninteractive apt remove -y influxdb
 
-                printf "#### Installing InfluxDB v${CORRECT_VERSION}...\n"
+    #             printf "#### Installing InfluxDB v${CORRECT_VERSION}...\n"
 
-                wget --quiet "${INSTALL_ADDRESS}${INSTALL_FILE}"
-                wget --quiet "${INSTALL_ADDRESS}${CLI_FILE}"
-                dpkg -i "${INSTALL_FILE}"
-                dpkg -i "${CLI_FILE}"
-                rm -rf "${CLI_FILE}"
-                rm -rf "${INSTALL_FILE}"
-                service influxd restart
-            else
-                printf "Correct version of InfluxDB currently installed.\n"
-            fi
-        else
-            printf "ERROR: Could not detect 64-bit architecture (x86_64/arm64) to install Influxdb 2.x (found ${UNAME_TYPE}/${MACHINE_TYPE}).\n"
-        fi
-    ;;
-    'update-influxdb-1-db-user')
-        printf "\n#### Creating InfluxDB 1.x database and user\n"
-        # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
-        for _ in {1..10}; do
-            # Check if influxdb has successfully started and be connected to
-            printf "#### Attempting to connect...\n" &&
-            curl -sL -I localhost:8086/ping > /dev/null &&
-            printf "#### Attempting to create database...\n" &&
-            influx -execute "CREATE DATABASE mycodo_db" &&
-            printf "#### Attempting to set up user...\n" &&
-            influx -database mycodo_db -execute "CREATE USER mycodo WITH PASSWORD 'mmdu77sj3nIoiajjs'" &&
-            printf "#### Influxdb database and user successfully created\n" &&
-            break ||
-            # Else wait 60 seconds if the influxd port is not accepting connections
-            # Everything below will begin executing if an error occurs before the break
-            printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
-            sleep 60
-        done
-    ;;
-    'update-influxdb-2-db-user')
-        if influx config | grep -q 'mycodo'; then
-            printf "#### InfluxDB v2.x config already present, skipping DB/user creation...\n"
-        else
-            printf "\n#### Creating InfluxDB 2.x database and user\n"
-            # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
-            for _ in {1..10}; do
-                # Check if influxdb has successfully started and be connected to
-                printf "#### Attempting to connect...\n" &&
-                curl -sL -I localhost:8086/ping > /dev/null &&
-                printf "#### Attempting to set up user...\n" &&
-                influx setup \
-                       --org mycodo \
-                       --bucket mycodo_db \
-                       --username mycodo \
-                       --password mmdu77sj3nIoiajjs \
-                       --force &&
-                printf "#### Influxdb database and user successfully created\n" &&
-                break ||
-                # Else wait 60 seconds if the influxd port is not accepting connections
-                # Everything below will begin executing if an error occurs before the break
-                printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
-                sleep 60
-            done
-        fi
-    ;;
-    'recreate-influxdb-1-db')
-        printf "\n#### Recreating InfluxDB 1.x database (deletes all measurement data!)\n"
-        # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
-        for _ in {1..10}; do
-            # Check if influxdb has successfully started and be connected to
-            printf "#### Attempting to connect...\n" &&
-            curl -sL -I localhost:8086/ping > /dev/null &&
-            printf "#### Attempting to recreate database...\n" &&
-            influx -execute "DROP DATABASE mycodo_db" &&
-            influx -execute "CREATE DATABASE mycodo_db" &&
-            printf "#### Influxdb database successfully recreated\n" &&
-            break ||
-            # Else wait 60 seconds if the influxd port is not accepting connections
-            # Everything below will begin executing if an error occurs before the break
-            printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
-            sleep 60
-        done
-    ;;
-    'recreate-influxdb-2-db')
-        printf "\n#### Recreating InfluxDB 2.x database (deletes all measurement data!)\n"
-        # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
-        for _ in {1..10}; do
-            # Check if influxdb has successfully started and be connected to
-            printf "#### Attempting to connect...\n" &&
-            curl -sL -I localhost:8086/ping > /dev/null &&
-            printf "#### Attempting to recreate database...\n" &&
-            influx bucket delete -n mycodo_db -o mycodo &&
-            influx bucket create -n mycodo_db -o mycodo &&
-            printf "#### Influxdb database successfully recreated\n" &&
-            break ||
-            # Else wait 60 seconds if the influxd port is not accepting connections
-            # Everything below will begin executing if an error occurs before the break
-            printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
-            sleep 60
-        done
-    ;;
+    #             wget --quiet "${INSTALL_ADDRESS}${INSTALL_FILE}"
+    #             wget --quiet "${INSTALL_ADDRESS}${CLI_FILE}"
+    #             dpkg -i "${INSTALL_FILE}"
+    #             dpkg -i "${CLI_FILE}"
+    #             rm -rf "${CLI_FILE}"
+    #             rm -rf "${INSTALL_FILE}"
+    #             service influxd restart
+    #         else
+    #             printf "Correct version of InfluxDB currently installed.\n"
+    #         fi
+    #     else
+    #         printf "ERROR: Could not detect 64-bit architecture (x86_64/arm64) to install Influxdb 2.x (found ${UNAME_TYPE}/${MACHINE_TYPE}).\n"
+    #     fi
+    # ;;
+    # 'update-influxdb-1-db-user')
+    #     printf "\n#### Creating InfluxDB 1.x database and user\n"
+    #     # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
+    #     for _ in {1..10}; do
+    #         # Check if influxdb has successfully started and be connected to
+    #         printf "#### Attempting to connect...\n" &&
+    #         curl -sL -I localhost:8086/ping > /dev/null &&
+    #         printf "#### Attempting to create database...\n" &&
+    #         influx -execute "CREATE DATABASE mycodo_db" &&
+    #         printf "#### Attempting to set up user...\n" &&
+    #         influx -database mycodo_db -execute "CREATE USER mycodo WITH PASSWORD 'mmdu77sj3nIoiajjs'" &&
+    #         printf "#### Influxdb database and user successfully created\n" &&
+    #         break ||
+    #         # Else wait 60 seconds if the influxd port is not accepting connections
+    #         # Everything below will begin executing if an error occurs before the break
+    #         printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
+    #         sleep 60
+    #     done
+    # ;;
+    # 'update-influxdb-2-db-user')
+    #     if influx config | grep -q 'mycodo'; then
+    #         printf "#### InfluxDB v2.x config already present, skipping DB/user creation...\n"
+    #     else
+    #         printf "\n#### Creating InfluxDB 2.x database and user\n"
+    #         # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
+    #         for _ in {1..10}; do
+    #             # Check if influxdb has successfully started and be connected to
+    #             printf "#### Attempting to connect...\n" &&
+    #             curl -sL -I localhost:8086/ping > /dev/null &&
+    #             printf "#### Attempting to set up user...\n" &&
+    #             influx setup \
+    #                    --org mycodo \
+    #                    --bucket mycodo_db \
+    #                    --username mycodo \
+    #                    --password mmdu77sj3nIoiajjs \
+    #                    --force &&
+    #             printf "#### Influxdb database and user successfully created\n" &&
+    #             break ||
+    #             # Else wait 60 seconds if the influxd port is not accepting connections
+    #             # Everything below will begin executing if an error occurs before the break
+    #             printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
+    #             sleep 60
+    #         done
+    #     fi
+    # ;;
+    # 'recreate-influxdb-1-db')
+    #     printf "\n#### Recreating InfluxDB 1.x database (deletes all measurement data!)\n"
+    #     # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
+    #     for _ in {1..10}; do
+    #         # Check if influxdb has successfully started and be connected to
+    #         printf "#### Attempting to connect...\n" &&
+    #         curl -sL -I localhost:8086/ping > /dev/null &&
+    #         printf "#### Attempting to recreate database...\n" &&
+    #         influx -execute "DROP DATABASE mycodo_db" &&
+    #         influx -execute "CREATE DATABASE mycodo_db" &&
+    #         printf "#### Influxdb database successfully recreated\n" &&
+    #         break ||
+    #         # Else wait 60 seconds if the influxd port is not accepting connections
+    #         # Everything below will begin executing if an error occurs before the break
+    #         printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
+    #         sleep 60
+    #     done
+    # ;;
+    # 'recreate-influxdb-2-db')
+    #     printf "\n#### Recreating InfluxDB 2.x database (deletes all measurement data!)\n"
+    #     # Attempt to connect to influxdb 10 times, sleeping 60 seconds every fail
+    #     for _ in {1..10}; do
+    #         # Check if influxdb has successfully started and be connected to
+    #         printf "#### Attempting to connect...\n" &&
+    #         curl -sL -I localhost:8086/ping > /dev/null &&
+    #         printf "#### Attempting to recreate database...\n" &&
+    #         influx bucket delete -n mycodo_db -o mycodo &&
+    #         influx bucket create -n mycodo_db -o mycodo &&
+    #         printf "#### Influxdb database successfully recreated\n" &&
+    #         break ||
+    #         # Else wait 60 seconds if the influxd port is not accepting connections
+    #         # Everything below will begin executing if an error occurs before the break
+    #         printf "#### Could not connect to Influxdb. Waiting 60 seconds then trying again...\n" &&
+    #         sleep 60
+    #     done
+    # ;;
     'update-logrotate')
         printf "\n#### Installing logrotate scripts\n"
         if [[ -e /etc/cron.daily/logrotate ]]; then
